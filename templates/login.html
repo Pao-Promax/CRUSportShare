@@ -4,9 +4,11 @@
 <div class="auth-wrap">
   <div class="auth-card">
     <div class="auth-head">
-      <div style="width:64px;height:64px;background:#fff;border-radius:16px;display:flex;align-items:center;justify-content:center;margin:0 auto 12px;overflow:hidden;">
-        <img src="{{ url_for('static', filename='images/cru-logo.png') }}" alt="CRU" style="width:100%;height:100%;object-fit:contain;padding:6px;" onerror="this.style.display='none'; this.nextElementSibling.style.display='block'">
-        <span style="display:none;color:#0f2a44;font-weight:800;font-size:20px;">CRU</span>
+      <div style="width:64px;height:64px;background:#fff;border-radius:16px;display:flex;align-items:center;justify-content:center;margin:0 auto 12px;">
+        <svg width="64" height="64" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+          <rect width="64" height="64" rx="16" fill="#0f2a44"/>
+          <text x="32" y="38" font-family="Kanit,sans-serif" font-size="22" font-weight="800" fill="white" text-anchor="middle">CRU</text>
+        </svg>
       </div>
       <h2>โรงเรียนชลราษฎรอำรุง</h2>
       <p>ระบบยืม-คืนอุปกรณ์กีฬา • Chonradsadornumrung School</p>

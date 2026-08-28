@@ -14,10 +14,12 @@
   <header class="topbar">
     <div class="topbar-inner">
       <a href="{% if current_admin %}{{ url_for('admin_dashboard') }}{% else %}{{ url_for('dashboard') }}{% endif %}" class="brand">
-        <div class="brand-logo">
-          {% set logo_path = url_for('static', filename='images/cru-logo.png') %}
-          <img src="{{ logo_path }}" alt="CRU Logo" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'">
-          <span class="brand-logo-fallback" style="display:none;">CRU</span>
+        <div class="brand-logo" style="background: white; display:flex; align-items:center; justify-content:center;">
+          <!-- Inline SVG logo - no external file needed, fixes Vercel 404 -->
+          <svg width="48" height="48" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg" style="border-radius:12px;">
+            <rect width="48" height="48" rx="12" fill="#0f2a44"/>
+            <text x="24" y="28" font-family="Kanit,sans-serif" font-size="16" font-weight="800" fill="white" text-anchor="middle">CRU</text>
+          </svg>
         </div>
         <div class="brand-text">
           <h1>โรงเรียนชลราษฎรอำรุง</h1>
