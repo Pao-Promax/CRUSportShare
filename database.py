@@ -2,7 +2,11 @@ import sqlite3
 import os
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-DB_PATH = os.path.join(BASE_DIR, "database", "cru_sports.db")
+# Vercel has read-only filesystem except /tmp
+if os.environ.get("VERCEL"):
+    DB_PATH = "/tmp/cru_sports.db"
+else:
+    DB_PATH = os.path.join(BASE_DIR, "database", "cru_sports.db")
 SCHEMA_PATH = os.path.join(BASE_DIR, "schema.sql")
 
 def get_db():
