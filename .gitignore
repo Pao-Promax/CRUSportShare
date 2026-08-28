@@ -6,6 +6,8 @@ venv/
 .venv/
 env/
 *.egg-info/
+# Env
+.env
 # Database
 database/*.db
 *.db
