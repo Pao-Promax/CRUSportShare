@@ -6,11 +6,42 @@ from functools import wraps
 from flask import Flask, render_template, request, redirect, url_for, session, flash, g, abort, jsonify
 from werkzeug.security import generate_password_hash, check_password_hash
 
-from database import get_db, ensure_db, check_overdue
+from database import get_db, ensure_db, check_overdue, is_supabase
 
 app = Flask(__name__)
 app.secret_key = os.environ.get("FLASK_SECRET_KEY", "cru-sports-borrow-secret-key-2026-change-in-production")
 app.config["PERMANENT_SESSION_LIFETIME"] = timedelta(hours=12)
+
+@app.route("/debug/supabase")
+def debug_supabase():
+    import os
+    info = {
+        "is_supabase": is_supabase(),
+        "supabase_url": os.environ.get("SUPABASE_URL", "default-ukklvfe"),
+        "use_supabase": os.environ.get("USE_SUPABASE", "1"),
+        "vercel": bool(os.environ.get("VERCEL")),
+    }
+    try:
+        # Try to query equipment via supabase
+        from database import supabase_select
+        rows = supabase_select("equipment", {"select": "id", "limit": "1"})
+        info["supabase_test"] = f"ok {len(rows)} rows" if rows is not None else "none"
+        if rows:
+            info["sample"] = rows[0]
+    except Exception as e:
+        info["supabase_error"] = str(e)
+        import traceback
+        info["trace"] = traceback.format_exc()[:1000]
+    # Also try SQLite
+    try:
+        conn = get_db()
+        # This will use SupabaseRestConnection if is_supabase, else sqlite
+        cur = conn.execute("SELECT COUNT(*) as c FROM equipment")
+        info["equipment_count_via_get_db"] = cur.fetchone()["c"]
+        conn.close()
+    except Exception as e:
+        info["get_db_error"] = str(e)
+    return jsonify(info)
 
 # Ensure DB on startup
 ensure_db()
