@@ -6,42 +6,11 @@ from functools import wraps
 from flask import Flask, render_template, request, redirect, url_for, session, flash, g, abort, jsonify
 from werkzeug.security import generate_password_hash, check_password_hash
 
-from database import get_db, ensure_db, check_overdue, is_supabase, supabase_client
+from database import get_db, ensure_db, check_overdue
 
 app = Flask(__name__)
 app.secret_key = os.environ.get("FLASK_SECRET_KEY", "cru-sports-borrow-secret-key-2026-change-in-production")
 app.config["PERMANENT_SESSION_LIFETIME"] = timedelta(hours=12)
-
-# Debug route to check DB mode
-@app.route("/debug/db")
-def debug_db():
-    try:
-        supa = is_supabase()
-        info = {
-            "supabase_enabled": supa,
-            "supabase_url": os.environ.get("SUPABASE_URL", "default"),
-            "use_supabase_env": os.environ.get("USE_SUPABASE", "1"),
-            "vercel": bool(os.environ.get("VERCEL")),
-        }
-        if supa and supabase_client:
-            try:
-                # Try to count equipment via supabase
-                res = supabase_client.table("equipment").select("id", count="exact").execute()
-                info["equipment_count_supabase"] = res.count if res.count is not None else len(res.data)
-            except Exception as e:
-                info["supabase_error"] = str(e)
-        else:
-            import sqlite3
-            try:
-                conn = get_db()
-                cur = conn.execute("SELECT COUNT(*) as c FROM equipment")
-                info["equipment_count_sqlite"] = cur.fetchone()["c"]
-                conn.close()
-            except Exception as e:
-                info["sqlite_error"] = str(e)
-        return jsonify(info)
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
 
 # Ensure DB on startup
 ensure_db()
