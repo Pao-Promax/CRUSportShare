@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="400" height="400" viewBox="0 0 400 400">
+  <rect width="400" height="400" rx="32" fill="#0f2a44"/>
+  <text x="200" y="180" font-family="Kanit, sans-serif" font-size="110" font-weight="800" fill="white" text-anchor="middle" dominant-baseline="middle">CRU</text>
+  <text x="200" y="250" font-family="Kanit, sans-serif" font-size="20" font-weight="600" fill="#ff7a00" text-anchor="middle">CHONRADSADORN</text>
+  <text x="200" y="275" font-family="Kanit, sans-serif" font-size="20" font-weight="600" fill="#ff7a00" text-anchor="middle">NUMRUNG</text>
+  <text x="200" y="310" font-family="Kanit, sans-serif" font-size="12" fill="white" opacity="0.8" text-anchor="middle">Since 1970</text>
+</svg>
