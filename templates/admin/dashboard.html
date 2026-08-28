@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+{% block title %}Admin Dashboard - CRU{% endblock %}
+{% block content %}
+<div class="admin-layout">
+  <aside class="admin-sidebar">
+    <div class="side-brand">
+      <div style="font-weight:800;font-size:16px;">CRU Admin</div>
+      <div style="font-size:12px;opacity:0.75;">ระบบจัดการยืม-คืน</div>
+    </div>
+    <nav>
+      <a href="{{ url_for('admin_dashboard') }}" class="active">📊 แดชบอร์ด</a>
+      <a href="{{ url_for('admin_equipment') }}">🏀 อุปกรณ์</a>
+      <a href="{{ url_for('admin_borrow_records') }}">📋 รายการยืม</a>
+      <a href="{{ url_for('admin_history') }}">🕘 ประวัติทั้งหมด</a>
+      <a href="{{ url_for('dashboard') }}">👨‍🎓 มุมนักเรียน</a>
+      <a href="{{ url_for('admin_logout') }}">🚪 ออกจากระบบ</a>
+    </nav>
+  </aside>
+  <div style="padding:20px;background:#f4f7fb;min-height:100%;">
+    <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;">
+      <div>
+        <h2 style="font-size:22px;font-weight:800;color:#0f2a44;">แดชบอร์ดผู้ดูแล</h2>
+        <p class="muted" style="font-size:13px;">ภาพรวมอุปกรณ์และการยืมทั้งหมด</p>
+      </div>
+      <a href="{{ url_for('admin_equipment_add') }}" class="btn btn-primary">+ เพิ่มอุปกรณ์</a>
+    </div>
+
+    <div class="stat-grid" style="margin-top:16px;">
+      <div class="stat-card navy"><h3>อุปกรณ์ทั้งหมด</h3><div class="value">{{ total_eq }}</div><div class="sub">ชิ้น</div></div>
+      <div class="stat-card green"><h3>ว่างพร้อมยืม</h3><div class="value">{{ total_avail }}</div><div class="sub">ชิ้น</div></div>
+      <div class="stat-card orange"><h3>ถูกยืมอยู่</h3><div class="value">{{ total_borrowed }}</div><div class="sub">ชิ้น</div></div>
+      <div class="stat-card red"><h3>เกินกำหนด</h3><div class="value">{{ overdue_count }}</div><div class="sub">รายการ</div></div>
+      <div class="stat-card blue"><h3>การยืมทั้งหมด</h3><div class="value">{{ total_borrows }}</div><div class="sub">รายการ</div></div>
+      <div class="stat-card" style="background:linear-gradient(135deg,#6366f1,#818cf8);"><h3>รออนุมัติ</h3><div class="value">{{ pending_count }}</div><div class="sub">รายการ</div></div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:16px;">
+      <div class="card card-pad">
+        <h3 style="font-weight:700;color:#0f2a44;">สถิติการยืมต่ออุปกรณ์</h3>
+        <p class="muted" style="font-size:12px;">จำนวนที่ถูกยืม = ทั้งหมด - ว่าง</p>
+        <div class="bar-chart" style="margin-top:14px;">
+          {% for eq in eq_stats %}
+          <div class="bar-row">
+            <span style="font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ eq.name }}</span>
+            <div class="bar-track">
+              {% set pct = (eq.borrowed / eq.total_quantity * 100) if eq.total_quantity>0 else 0 %}
+              <div class="bar-fill" style="width: {{ pct }}%"></div>
+            </div>
+            <span style="font-weight:700;color:#0f2a44;">{{ eq.borrowed }}/{{ eq.total_quantity }}</span>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+
+      <div class="card card-pad">
+        <h3 style="font-weight:700;color:#0f2a44;">แนวโน้มรายเดือน (6 เดือนล่าสุด)</h3>
+        {% if monthly %}
+        <div class="bar-chart" style="margin-top:14px;">
+          {% set max_cnt = monthly|map(attribute='cnt')|max %}
+          {% for m in monthly %}
+          <div class="bar-row">
+            <span style="font-weight:600;">{{ m.month }}</span>
+            <div class="bar-track">
+              {% set pct2 = (m.cnt / max_cnt * 100) if max_cnt>0 else 0 %}
+              <div class="bar-fill" style="width: {{ pct2 }}%;background:linear-gradient(90deg,#16a34a,#0f2a44);"></div>
+            </div>
+            <span style="font-weight:700;">{{ m.cnt }}</span>
+          </div>
+          {% endfor %}
+        </div>
+        {% else %}
+        <p class="muted" style="margin-top:12px;">ยังไม่มีข้อมูลรายเดือน</p>
+        {% endif %}
+
+        <h4 style="margin-top:18px;font-weight:700;color:#0f2a44;">รายการล่าสุด</h4>
+        <div style="margin-top:10px;display:grid;gap:8px;">
+          {% for r in recent %}
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:10px;border:1px solid #e6ecf5;border-radius:10px;background:#fff;font-size:13px;">
+            <div>
+              <div style="font-weight:600;">{{ r.eq_name }} ×{{ r.quantity }} — {{ r.user_name }} ({{ r.student_id }})</div>
+              <div class="muted" style="font-size:12px;">{{ r.status }} • {{ r.created_at[:10] }}</div>
+            </div>
+            <span class="status-pill {% if r.status=='pending' %}badge-pending{% elif r.status=='overdue' %}badge-unavailable{% elif r.status=='returned' %}badge-returned{% else %}badge-approved{% endif %}" style="font-size:10px;">{{ r.status }}</span>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+
+    <div class="card card-pad" style="margin-top:16px;">
+      <h3 style="font-weight:700;color:#0f2a44;">ทางลัดผู้ดูแล</h3>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:12px;">
+        <a href="{{ url_for('admin_equipment') }}" class="btn btn-secondary">จัดการอุปกรณ์</a>
+        <a href="{{ url_for('admin_borrow_records') }}" class="btn btn-primary">ตรวจสอบการยืม ({{ pending_count }} รออนุมัติ)</a>
+        <a href="{{ url_for('admin_history') }}" class="btn btn-ghost">ดูประวัติทั้งหมด</a>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

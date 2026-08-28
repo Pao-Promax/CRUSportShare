@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% block title %}สมัครสมาชิก - CRU Sports Borrow{% endblock %}
+{% block content %}
+<div class="auth-wrap">
+  <div class="auth-card">
+    <div class="auth-head">
+      <h2>สมัครสมาชิกนักเรียน</h2>
+      <p>กรอกข้อมูลเพื่อสร้างบัญชีสำหรับยืมอุปกรณ์กีฬา</p>
+    </div>
+    <div class="auth-body">
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          {% for cat, msg in messages %}
+            <div class="alert alert-{{cat}}">{{msg}}</div>
+          {% endfor %}
+        {% endif %}
+      {% endwith %}
+      <form method="POST" class="form-grid">
+        <div class="form-row">
+          <div class="form-group">
+            <label>รหัสนักเรียน *</label>
+            <input type="text" name="student_id" placeholder="เช่น CRU66010" required>
+          </div>
+          <div class="form-group">
+            <label>ชั้นเรียน</label>
+            <input type="text" name="class_name" placeholder="เช่น ม.5/1">
+          </div>
+        </div>
+        <div class="form-group">
+          <label>ชื่อ-นามสกุล *</label>
+          <input type="text" name="name" placeholder="ชื่อ นามสกุล" required>
+        </div>
+        <div class="form-group">
+          <label>อีเมล (ถ้ามี)</label>
+          <input type="email" name="email" placeholder="name@cru.ac.th">
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>รหัสผ่าน * (≥6 ตัวอักษร)</label>
+            <input type="password" name="password" required>
+          </div>
+          <div class="form-group">
+            <label>ยืนยันรหัสผ่าน *</label>
+            <input type="password" name="confirm_password" required>
+          </div>
+        </div>
+        <button type="submit" class="btn btn-primary btn-block" style="padding:12px;">สมัครสมาชิก</button>
+      </form>
+      <div style="margin-top:14px;text-align:center;">
+        <a href="{{ url_for('login') }}" style="color:#0f2a44;font-weight:600;font-size:14px;">มีบัญชีแล้ว? เข้าสู่ระบบ →</a>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

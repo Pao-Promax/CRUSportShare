@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+{% block title %}จัดการอุปกรณ์ - Admin{% endblock %}
+{% block content %}
+<div class="admin-layout">
+  <aside class="admin-sidebar">
+    <div class="side-brand"><div style="font-weight:800;">CRU Admin</div><div style="font-size:12px;opacity:0.75;">จัดการอุปกรณ์</div></div>
+    <nav>
+      <a href="{{ url_for('admin_dashboard') }}">📊 แดชบอร์ด</a>
+      <a href="{{ url_for('admin_equipment') }}" class="active">🏀 อุปกรณ์</a>
+      <a href="{{ url_for('admin_borrow_records') }}">📋 รายการยืม</a>
+      <a href="{{ url_for('admin_history') }}">🕘 ประวัติทั้งหมด</a>
+    </nav>
+  </aside>
+  <div style="padding:20px;background:#f4f7fb;">
+    <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;">
+      <div>
+        <h2 style="font-size:22px;font-weight:800;color:#0f2a44;">จัดการอุปกรณ์กีฬา</h2>
+        <p class="muted" style="font-size:13px;">เพิ่ม / แก้ไข / ลบ / ปรับจำนวนอุปกรณ์</p>
+      </div>
+      <a href="{{ url_for('admin_equipment_add') }}" class="btn btn-primary">+ เพิ่มอุปกรณ์</a>
+    </div>
+
+    <div class="table-wrap" style="margin-top:16px;">
+      <table>
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>รูป</th>
+            <th>ชื่ออุปกรณ์</th>
+            <th>ทั้งหมด</th>
+            <th>ว่าง</th>
+            <th>ถูกยืม</th>
+            <th>สถานะ</th>
+            <th>จัดการ</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for eq in equipments %}
+          <tr>
+            <td>#{{ eq.id }}</td>
+            <td><img src="{{ eq.image }}" alt="{{ eq.name }}" style="width:48px;height:48px;border-radius:8px;object-fit:cover;border:1px solid #e6ecf5;"></td>
+            <td>
+              <div style="font-weight:600;">{{ eq.name }}</div>
+              <div class="muted" style="font-size:12px;max-width:260px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">{{ eq.description }}</div>
+            </td>
+            <td style="font-weight:700;">{{ eq.total_quantity }}</td>
+            <td style="color:#16a34a;font-weight:700;">{{ eq.available_quantity }}</td>
+            <td style="color:#ff7a00;font-weight:700;">{{ eq.borrowed_quantity }}</td>
+            <td>
+              {% if eq.available_quantity<=0 %}<span class="status-pill badge-unavailable">ไม่พร้อมใช้งาน</span>
+              {% else %}<span class="status-pill badge-available">ว่าง</span>{% endif %}
+            </td>
+            <td>
+              <div style="display:flex;gap:6px;flex-wrap:wrap;">
+                <a href="{{ url_for('admin_equipment_edit', eq_id=eq.id) }}" class="btn btn-ghost btn-sm">แก้ไข</a>
+                <form method="POST" action="{{ url_for('admin_equipment_delete', eq_id=eq.id) }}">
+                  <button type="submit" class="btn btn-danger btn-sm" data-confirm="ยืนยันลบ {{eq.name}}?">ลบ</button>
+                </form>
+              </div>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

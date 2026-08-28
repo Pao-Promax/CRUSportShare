@@ -1,0 +1,107 @@
+{% extends "base.html" %}
+{% block title %}รายการยืม - Admin{% endblock %}
+{% block content %}
+<div class="admin-layout">
+  <aside class="admin-sidebar">
+    <div class="side-brand"><div style="font-weight:800;">CRU Admin</div><div style="font-size:12px;opacity:0.75;">รายการยืม</div></div>
+    <nav>
+      <a href="{{ url_for('admin_dashboard') }}">📊 แดชบอร์ด</a>
+      <a href="{{ url_for('admin_equipment') }}">🏀 อุปกรณ์</a>
+      <a href="{{ url_for('admin_borrow_records') }}" class="active">📋 รายการยืม</a>
+      <a href="{{ url_for('admin_history') }}">🕘 ประวัติทั้งหมด</a>
+    </nav>
+  </aside>
+  <div style="padding:20px;background:#f4f7fb;">
+    <h2 style="font-size:22px;font-weight:800;color:#0f2a44;">รายการยืมทั้งหมด</h2>
+    <p class="muted" style="font-size:13px;">ค้นหานักเรียน / อุปกรณ์ / สถานะ • อนุมัติ • ปฏิเสธ • บันทึกการคืน</p>
+
+    <div class="card card-pad" style="margin-top:14px;">
+      <form method="GET" class="toolbar" style="margin-bottom:0;">
+        <div class="search-box">
+          <span class="icon">🔍</span>
+          <input type="text" name="search" value="{{ search }}" placeholder="ค้นหา ชื่อนักเรียน, รหัสนักเรียน, ชื่ออุปกรณ์...">
+        </div>
+        <select name="status" style="padding:11px 14px;border:1px solid #e6ecf5;border-radius:999px;background:#fff;">
+          <option value="">ทุกสถานะ</option>
+          <option value="pending" {% if status_filter=='pending' %}selected{% endif %}>pending - รออนุมัติ</option>
+          <option value="approved" {% if status_filter=='approved' %}selected{% endif %}>approved - อนุมัติแล้ว</option>
+          <option value="borrowed" {% if status_filter=='borrowed' %}selected{% endif %}>borrowed - กำลังยืม</option>
+          <option value="overdue" {% if status_filter=='overdue' %}selected{% endif %}>overdue - เกินกำหนด</option>
+          <option value="returned" {% if status_filter=='returned' %}selected{% endif %}>returned - คืนแล้ว</option>
+          <option value="rejected" {% if status_filter=='rejected' %}selected{% endif %}>rejected - ปฏิเสธ</option>
+        </select>
+        <button type="submit" class="btn btn-secondary">ค้นหา</button>
+        {% if search or status_filter %}<a href="{{ url_for('admin_borrow_records') }}" class="btn btn-ghost">ล้าง</a>{% endif %}
+      </form>
+    </div>
+
+    <div class="table-wrap" style="margin-top:14px;">
+      <table>
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>นักเรียน</th>
+            <th>อุปกรณ์</th>
+            <th>จำนวน</th>
+            <th>ยืม</th>
+            <th>กำหนดคืน</th>
+            <th>สถานะ</th>
+            <th>จัดการ</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for r in records %}
+          <tr>
+            <td>#{{ r.id }}</td>
+            <td>
+              <div style="font-weight:600;">{{ r.user_name }}</div>
+              <div class="muted" style="font-size:12px;">{{ r.student_id }} • {{ r.class_name or '-' }}</div>
+            </td>
+            <td>
+              <div style="display:flex;gap:8px;align-items:center;">
+                <img src="{{ r.eq_image }}" style="width:36px;height:36px;border-radius:8px;object-fit:cover;border:1px solid #e6ecf5;">
+                <span style="font-weight:600;">{{ r.eq_name }}</span>
+              </div>
+            </td>
+            <td style="font-weight:700;">{{ r.quantity }}</td>
+            <td style="font-size:13px;">{{ r.borrow_date|thai_date if r.borrow_date else '-' }}</td>
+            <td style="font-size:13px;font-weight:600;">{{ r.due_date|thai_date }}</td>
+            <td>
+              <span class="status-pill 
+                {% if r.status=='pending' %}badge-pending
+                {% elif r.status=='approved' %}badge-approved
+                {% elif r.status=='borrowed' %}badge-borrowed
+                {% elif r.status=='overdue' %}badge-unavailable
+                {% elif r.status=='returned' %}badge-returned
+                {% elif r.status=='rejected' %}badge-rejected{% endif %}">
+                {{ r.status }}
+              </span>
+            </td>
+            <td>
+              <div style="display:flex;gap:6px;flex-wrap:wrap;">
+                {% if r.status=='pending' %}
+                  <form method="POST" action="{{ url_for('admin_borrow_approve', record_id=r.id) }}">
+                    <button type="submit" class="btn btn-secondary btn-sm" data-confirm="อนุมัติให้ {{r.user_name}} ยืม {{r.eq_name}} {{r.quantity}} ชิ้น?">อนุมัติ</button>
+                  </form>
+                  <form method="POST" action="{{ url_for('admin_borrow_reject', record_id=r.id) }}">
+                    <button type="submit" class="btn btn-ghost btn-sm" data-confirm="ปฏิเสธคำขอยืมนี้?">ปฏิเสธ</button>
+                  </form>
+                {% elif r.status in ['approved','borrowed','overdue'] %}
+                  <form method="POST" action="{{ url_for('admin_return', record_id=r.id) }}">
+                    <button type="submit" class="btn btn-primary btn-sm" data-confirm="บันทึกการคืน {{r.eq_name}} จาก {{r.user_name}}?">บันทึกคืน</button>
+                  </form>
+                {% else %}
+                  <span class="muted" style="font-size:12px;">—</span>
+                {% endif %}
+              </div>
+            </td>
+          </tr>
+          {% else %}
+          <tr><td colspan="8" class="text-center muted" style="padding:24px;">ไม่พบรายการ</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

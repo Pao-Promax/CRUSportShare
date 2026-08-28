@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block title %}เกิดข้อผิดพลาด - 500{% endblock %}
+{% block content %}
+<div class="container text-center" style="padding:60px 20px;">
+  <div style="font-size:72px;">⚠️</div>
+  <h2 style="font-size:28px;font-weight:800;color:#0f2a44;margin-top:12px;">เกิดข้อผิดพลาดภายในระบบ (500)</h2>
+  <p class="muted" style="margin-top:8px;">ระบบขัดข้องชั่วคราว กรุณาลองใหม่หรือติดต่อผู้ดูแล</p>
+  <div style="margin-top:18px;">
+    <a href="{{ url_for('dashboard') if session.get('user_id') else url_for('login') }}" class="btn btn-primary">กลับหน้าหลัก</a>
+  </div>
+</div>
+{% endblock %}

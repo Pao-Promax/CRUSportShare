@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block title %}Admin Login - CRU{% endblock %}
+{% block content %}
+<div class="auth-wrap">
+  <div class="auth-card" style="max-width:480px;">
+    <div class="auth-head" style="background:linear-gradient(135deg,#0f2a44 0%, #1e4b7a 100%);">
+      <div style="width:56px;height:56px;background:#ff7a00;border-radius:14px;display:flex;align-items:center;justify-content:center;margin:0 auto 12px;font-weight:800;color:#fff;font-size:20px;">A</div>
+      <h2>ผู้ดูแลระบบ</h2>
+      <p>Admin Login — โรงเรียนชลราษฎรอำรุง</p>
+    </div>
+    <div class="auth-body">
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          {% for cat, msg in messages %}
+            <div class="alert alert-{{cat}}">{{msg}}</div>
+          {% endfor %}
+        {% endif %}
+      {% endwith %}
+      <form method="POST" class="form-grid">
+        <div class="form-group">
+          <label>ชื่อผู้ใช้ผู้ดูแล</label>
+          <input type="text" name="username" placeholder="เช่น admin" required autofocus>
+        </div>
+        <div class="form-group">
+          <label>รหัสผ่าน</label>
+          <input type="password" name="password" placeholder="••••••" required>
+        </div>
+        <button type="submit" class="btn btn-primary btn-block" style="padding:12px;">เข้าสู่ระบบผู้ดูแล</button>
+      </form>
+      <div style="margin-top:14px;display:flex;gap:10px;">
+        <a href="{{ url_for('login') }}" class="btn btn-ghost" style="flex:1;">กลับหน้า นักเรียน</a>
+        <a href="{{ url_for('admin_dashboard') }}" class="btn btn-secondary" style="flex:1;">ไปแดชบอร์ด</a>
+      </div>
+      <div style="margin-top:14px;background:#f4f7fb;border:1px solid #e6ecf5;border-radius:12px;padding:12px;font-size:13px;">
+        <div><strong>Admin:</strong> <code>admin</code> / <code>admin123</code></div>
+        <div><strong>สำรอง:</strong> <code>cru_admin</code> / <code>cru1234</code></div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

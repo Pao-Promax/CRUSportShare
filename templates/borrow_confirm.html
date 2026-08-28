@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block title %}ยืนยันการยืม - {{ eq.name }}{% endblock %}
+{% block content %}
+<div class="container" style="max-width:760px;">
+  <a href="{{ url_for('equipment_detail', eq_id=eq.id) }}" style="display:inline-flex;align-items:center;gap:6px;color:#0f2a44;font-weight:600;font-size:14px;margin:10px 0 14px;">← กลับรายละเอียด</a>
+
+  <div class="card card-pad">
+    <h2 style="font-size:22px;font-weight:800;color:#0f2a44;">ยืนยันการยืม</h2>
+    <p class="muted" style="font-size:14px;margin-top:4px;">กรุณาตรวจสอบข้อมูลก่อนยืนยันคำขอยืม (ต้องรอผู้ดูแลอนุมัติ)</p>
+
+    <div style="display:flex;gap:16px;align-items:center;margin:18px 0;padding:16px;background:#f4f7fb;border:1px solid #e6ecf5;border-radius:16px;">
+      <img src="{{ eq.image }}" alt="{{ eq.name }}" style="width:92px;height:92px;border-radius:12px;object-fit:cover;background:#fff;border:1px solid #e6ecf5;">
+      <div>
+        <h3 style="font-size:18px;font-weight:700;color:#0f2a44;">{{ eq.name }}</h3>
+        <p class="muted" style="font-size:13px;margin-top:2px;">{{ eq.description[:90] }}...</p>
+        <div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap;">
+          <span class="badge" style="background:#0f2a44;color:#fff;">ทั้งหมด {{ eq.total_quantity }}</span>
+          <span class="badge" style="background:#16a34a;color:#fff;">ว่าง {{ eq.available_quantity }}</span>
+          <span class="badge" style="background:#ff7a00;color:#fff;">ถูกยืม {{ eq.borrowed_quantity }}</span>
+        </div>
+      </div>
+    </div>
+
+    <form method="POST" class="form-grid">
+      <div class="form-group" data-qty>
+        <label>จำนวนที่ต้องการยืม *</label>
+        <div style="display:flex;gap:10px;align-items:center;">
+          <button type="button" data-minus class="btn btn-ghost" style="width:44px;height:44px;padding:0;border-radius:12px;">−</button>
+          <input type="number" name="quantity" value="1" min="1" max="{{ eq.available_quantity }}" required style="text-align:center;font-weight:700;font-size:18px;height:44px;flex:1;">
+          <button type="button" data-plus class="btn btn-ghost" style="width:44px;height:44px;padding:0;border-radius:12px;">+</button>
+        </div>
+        <div class="help">ว่าง {{ eq.available_quantity }} ชิ้น • ห้ามเกินจำนวนที่ว่าง และห้ามติดลบ</div>
+      </div>
+
+      <div class="form-group">
+        <label>วันกำหนดคืน *</label>
+        <input type="date" name="due_date" value="{{ default_due }}" required>
+        <div class="help">ยืมได้ไม่เกิน 30 วัน นับจากวันนี้ (ค่าเริ่มต้น +7 วัน)</div>
+      </div>
+
+      <div style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:12px;padding:12px;font-size:13px;color:#1e40af;">
+        เมื่อกดยืนยัน ระบบจะสร้างรายการสถานะ <strong>pending</strong> และรอผู้ดูแลอนุมัติ จากนั้น <code>available_quantity</code> จะลดลงตามจำนวนที่ยืม
+      </div>
+
+      <div style="display:flex;gap:10px;margin-top:6px;">
+        <a href="{{ url_for('equipment_detail', eq_id=eq.id) }}" class="btn btn-ghost" style="flex:1;">ยกเลิก</a>
+        <button type="submit" class="btn btn-primary" style="flex:1;padding:13px;">ยืนยันการยืม</button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

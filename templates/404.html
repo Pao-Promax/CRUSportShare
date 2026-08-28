@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block title %}ไม่พบหน้า - 404{% endblock %}
+{% block content %}
+<div class="container text-center" style="padding:60px 20px;">
+  <div style="font-size:72px;">🔍</div>
+  <h2 style="font-size:28px;font-weight:800;color:#0f2a44;margin-top:12px;">ไม่พบหน้าที่คุณต้องการ (404)</h2>
+  <p class="muted" style="margin-top:8px;">หน้าที่คุณเข้าถึงไม่มีอยู่ หรือถูกลบไปแล้ว</p>
+  <div style="margin-top:18px;display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">
+    <a href="{{ url_for('dashboard') if session.user_id else url_for('login') }}" class="btn btn-primary">กลับหน้าหลัก</a>
+    <a href="javascript:history.back()" class="btn btn-ghost">ย้อนกลับ</a>
+  </div>
+</div>
+{% endblock %}

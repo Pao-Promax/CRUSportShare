@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+{% block title %}ประวัติการยืม - CRU{% endblock %}
+{% block content %}
+<div class="container">
+  <div class="page-title">
+    <div>
+      <h2>ประวัติการยืมของฉัน</h2>
+      <p>ติดตามสถานะการยืม การอนุมัติ และการคืนอุปกรณ์</p>
+    </div>
+    <a href="{{ url_for('dashboard') }}" class="btn btn-ghost">ยืมอุปกรณ์เพิ่ม</a>
+  </div>
+
+  {% if records %}
+  <div class="timeline">
+    {% for r in records %}
+    <div class="history-card">
+      <img src="{{ r.eq_image }}" alt="{{ r.eq_name }}">
+      <div class="hist-meta">
+        <h4>{{ r.eq_name }} <span style="font-weight:400;color:#6b7a90;">× {{ r.quantity }} ชิ้น</span></h4>
+        <p>
+          สถานะ:
+          <span class="status-pill 
+            {% if r.status=='pending' %}badge-pending
+            {% elif r.status=='approved' %}badge-approved
+            {% elif r.status=='borrowed' %}badge-borrowed
+            {% elif r.status=='returned' %}badge-returned
+            {% elif r.status=='overdue' %}badge-unavailable
+            {% elif r.status=='rejected' %}badge-rejected{% endif %}" style="font-size:11px;">
+            {% if r.status=='pending' %}รอการอนุมัติ
+            {% elif r.status=='approved' %}อนุมัติแล้ว
+            {% elif r.status=='borrowed' %}กำลังยืม
+            {% elif r.status=='returned' %}คืนแล้ว
+            {% elif r.status=='overdue' %}เกินกำหนด
+            {% elif r.status=='rejected' %}ปฏิเสธ{% else %}{{ r.status }}{% endif %}
+          </span>
+          • ขอยืม {{ r.created_at|thai_date }} • กำหนดคืน <strong>{{ r.due_date|thai_date }}</strong>
+          {% if r.borrow_date %}• วันที่ยืม {{ r.borrow_date|thai_date }}{% endif %}
+          {% if r.return_date %}• คืนเมื่อ {{ r.return_date|thai_date }}{% endif %}
+        </p>
+        <p style="font-size:12px;color:#6b7a90;">#{{ r.id }} • อุปกรณ์ ID {{ r.equipment_id }}</p>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:8px;align-items:end;">
+        <a href="{{ url_for('equipment_detail', eq_id=r.equipment_id) }}" class="btn btn-ghost btn-sm">ดูอุปกรณ์</a>
+        {% if r.status in ['approved','borrowed','overdue'] %}
+        <form method="POST" action="{{ url_for('return_equipment', record_id=r.id) }}">
+          <button type="submit" class="btn btn-secondary btn-sm" data-confirm="ยืนยันการคืน {{r.eq_name}} จำนวน {{r.quantity}} ชิ้น?">คืนอุปกรณ์</button>
+        </form>
+        {% elif r.status=='pending' %}
+        <span class="muted" style="font-size:12px;">รอผู้ดูแลอนุมัติ</span>
+        {% endif %}
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  {% else %}
+  <div class="card card-pad text-center" style="padding:40px;">
+    <div style="font-size:42px;">📋</div>
+    <h3 style="margin-top:10px;">ยังไม่มีประวัติการยืม</h3>
+    <p class="muted">เริ่มยืมอุปกรณ์กีฬาได้ที่หน้าหลัก</p>
+    <a href="{{ url_for('dashboard') }}" class="btn btn-primary" style="margin-top:12px;">ไปยืมอุปกรณ์</a>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

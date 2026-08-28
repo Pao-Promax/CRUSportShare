@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+{% block title %}ประวัติยืม-คืน - Admin{% endblock %}
+{% block content %}
+<div class="admin-layout">
+  <aside class="admin-sidebar">
+    <div class="side-brand"><div style="font-weight:800;">CRU Admin</div><div style="font-size:12px;opacity:0.75;">ประวัติ</div></div>
+    <nav>
+      <a href="{{ url_for('admin_dashboard') }}">📊 แดชบอร์ด</a>
+      <a href="{{ url_for('admin_equipment') }}">🏀 อุปกรณ์</a>
+      <a href="{{ url_for('admin_borrow_records') }}">📋 รายการยืม</a>
+      <a href="{{ url_for('admin_history') }}" class="active">🕘 ประวัติทั้งหมด</a>
+    </nav>
+  </aside>
+  <div style="padding:20px;background:#f4f7fb;">
+    <h2 style="font-size:22px;font-weight:800;color:#0f2a44;">ประวัติการยืม-คืนทั้งหมด</h2>
+    <p class="muted" style="font-size:13px;">ค้นหาและกรองตามสถานะ</p>
+
+    <div class="card card-pad" style="margin-top:14px;">
+      <form method="GET" class="toolbar" style="margin-bottom:0;">
+        <div class="search-box">
+          <span class="icon">🔍</span>
+          <input type="text" name="search" value="{{ search or '' }}" placeholder="ค้นหา ชื่อนักเรียน, รหัส, อุปกรณ์...">
+        </div>
+        <select name="status" style="padding:11px 14px;border:1px solid #e6ecf5;border-radius:999px;background:#fff;">
+          <option value="">ทุกสถานะ</option>
+          <option value="pending" {% if status_filter=='pending' %}selected{% endif %}>pending</option>
+          <option value="approved" {% if status_filter=='approved' %}selected{% endif %}>approved</option>
+          <option value="borrowed" {% if status_filter=='borrowed' %}selected{% endif %}>borrowed</option>
+          <option value="overdue" {% if status_filter=='overdue' %}selected{% endif %}>overdue</option>
+          <option value="returned" {% if status_filter=='returned' %}selected{% endif %}>returned</option>
+          <option value="rejected" {% if status_filter=='rejected' %}selected{% endif %}>rejected</option>
+        </select>
+        <button type="submit" class="btn btn-secondary">กรอง</button>
+        {% if search or status_filter %}<a href="{{ url_for('admin_history') }}" class="btn btn-ghost">ล้าง</a>{% endif %}
+      </form>
+    </div>
+
+    <div class="table-wrap" style="margin-top:14px;">
+      <table>
+        <thead>
+          <tr>
+            <th>ID</th><th>นักเรียน</th><th>อุปกรณ์</th><th>จำนวน</th><th>ยืม</th><th>กำหนดคืน</th><th>คืน</th><th>สถานะ</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for r in records %}
+          <tr>
+            <td>#{{ r.id }}</td>
+            <td><div style="font-weight:600;">{{ r.user_name }}</div><div class="muted" style="font-size:12px;">{{ r.student_id }}</div></td>
+            <td>{{ r.eq_name }}</td>
+            <td>{{ r.quantity }}</td>
+            <td>{{ r.borrow_date|thai_date if r.borrow_date else '-' }}</td>
+            <td>{{ r.due_date|thai_date }}</td>
+            <td>{{ r.return_date|thai_date if r.return_date else '-' }}</td>
+            <td><span class="status-pill 
+              {% if r.status=='pending' %}badge-pending
+              {% elif r.status=='approved' %}badge-approved
+              {% elif r.status=='borrowed' %}badge-borrowed
+              {% elif r.status=='overdue' %}badge-unavailable
+              {% elif r.status=='returned' %}badge-returned
+              {% elif r.status=='rejected' %}badge-rejected{% endif %}">{{ r.status }}</span></td>
+          </tr>
+          {% else %}
+          <tr><td colspan="8" class="text-center muted" style="padding:24px;">ไม่พบข้อมูล</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

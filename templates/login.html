@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% block title %}เข้าสู่ระบบ - CRU Sports Borrow{% endblock %}
+{% block content %}
+<div class="auth-wrap">
+  <div class="auth-card">
+    <div class="auth-head">
+      <div style="width:64px;height:64px;background:#fff;border-radius:16px;display:flex;align-items:center;justify-content:center;margin:0 auto 12px;overflow:hidden;">
+        <img src="{{ url_for('static', filename='images/cru-logo.png') }}" alt="CRU" style="width:100%;height:100%;object-fit:contain;padding:6px;" onerror="this.style.display='none'; this.nextElementSibling.style.display='block'">
+        <span style="display:none;color:#0f2a44;font-weight:800;font-size:20px;">CRU</span>
+      </div>
+      <h2>โรงเรียนชลราษฎรอำรุง</h2>
+      <p>ระบบยืม-คืนอุปกรณ์กีฬา • Chonradsadornumrung School</p>
+    </div>
+    <div class="auth-body">
+      <h3 style="font-size:18px;font-weight:700;color:#0f2a44;">เข้าสู่ระบบนักเรียน</h3>
+      <p class="muted" style="font-size:13px;margin:4px 0 16px;">กรอกรหัสนักเรียนและรหัสผ่านเพื่อใช้งานระบบ</p>
+
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          {% for cat, msg in messages %}
+            <div class="alert alert-{{cat}}">{{msg}}</div>
+          {% endfor %}
+        {% endif %}
+      {% endwith %}
+
+      <form method="POST" class="form-grid">
+        <div class="form-group">
+          <label>รหัสนักเรียน / Username</label>
+          <input type="text" name="student_id" placeholder="เช่น CRU66001 หรือ student" required autofocus>
+        </div>
+        <div class="form-group">
+          <label>รหัสผ่าน</label>
+          <input type="password" name="password" placeholder="••••••" required>
+        </div>
+        <button type="submit" class="btn btn-primary btn-block" style="margin-top:6px;padding:12px;">เข้าสู่ระบบ</button>
+      </form>
+
+      <div style="margin-top:14px;display:flex;gap:10px;flex-wrap:wrap;">
+        <a href="{{ url_for('register') }}" class="btn btn-ghost" style="flex:1;">สมัครสมาชิก</a>
+        <a href="{{ url_for('admin_login') }}" class="btn btn-ghost" style="flex:1;">เข้าสู่ระบบผู้ดูแล</a>
+      </div>
+
+      <div class="divider"><span>บัญชีทดสอบ</span></div>
+      <div style="background:#f4f7fb;border:1px solid #e6ecf5;border-radius:12px;padding:12px;font-size:13px;line-height:1.7;">
+        <div><strong>นักเรียน:</strong> <code>student</code> / <code>student123</code></div>
+        <div><strong>หรือ:</strong> <code>CRU66001</code> / <code>123456</code></div>
+        <div><strong>ผู้ดูแล:</strong> <code>admin</code> / <code>admin123</code> — <a href="{{ url_for('admin_login') }}" style="color:#ff7a00;font-weight:700;">ไปหน้า Admin →</a></div>
+      </div>
+
+      <p class="muted text-center" style="font-size:12px;margin-top:16px;">หากยังไม่มีบัญชี ให้กดสมัครสมาชิกหรือติดต่อครูผู้ดูแล</p>
+    </div>
+  </div>
+</div>
+{% endblock %}

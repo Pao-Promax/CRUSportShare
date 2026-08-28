@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+{% block title %}แดชบอร์ด - CRU Sports Borrow{% endblock %}
+{% block content %}
+<div class="container">
+  <div class="page-title">
+    <div>
+      <h2>สวัสดี, {{ session.user_name }} 👋</h2>
+      <p>ระบบยืม-คืนอุปกรณ์กีฬา โรงเรียนชลราษฎรอำรุง — ดูอุปกรณ์ที่ว่างและยืมได้ทันที</p>
+    </div>
+    <div style="display:flex;gap:8px;">
+      <a href="{{ url_for('history') }}" class="btn btn-ghost">ประวัติของฉัน</a>
+      <a href="{{ url_for('profile') }}" class="btn btn-secondary">โปรไฟล์</a>
+    </div>
+  </div>
+
+  <div class="stat-grid">
+    <div class="stat-card navy">
+      <h3>อุปกรณ์ทั้งหมด</h3>
+      <div class="value">{{ total_eq }}</div>
+      <div class="sub">ชิ้น (รวมทุกชนิด)</div>
+    </div>
+    <div class="stat-card green">
+      <h3>ว่างพร้อมยืม</h3>
+      <div class="value">{{ total_avail }}</div>
+      <div class="sub">ชิ้น</div>
+    </div>
+    <div class="stat-card orange">
+      <h3>ถูกยืมอยู่</h3>
+      <div class="value">{{ total_borrowed }}</div>
+      <div class="sub">ชิ้น</div>
+    </div>
+    <div class="stat-card {% if my_overdue>0 %}red{% else %}blue{% endif %}">
+      <h3>ของฉัน</h3>
+      <div class="value">{{ my_borrowed }} / {{ my_pending }}</div>
+      <div class="sub">ยืมอยู่ / รออนุมัติ {% if my_overdue>0 %}• เกินกำหนด {{my_overdue}}{% endif %}</div>
+    </div>
+  </div>
+
+  <div class="card card-pad" style="margin-bottom:18px;">
+    <form method="GET" class="toolbar" style="margin-bottom:0;">
+      <div class="search-box">
+        <span class="icon">🔍</span>
+        <input type="text" name="search" value="{{ search }}" placeholder="ค้นหาอุปกรณ์ เช่น บาสเกตบอล, ฟุตบอล, แบดมินตัน...">
+      </div>
+      <div class="filter-chips">
+        <a href="{{ url_for('dashboard', search=search) }}" class="chip {% if not status_filter %}active{% endif %}">ทั้งหมด</a>
+        <a href="{{ url_for('dashboard', search=search, status='available') }}" class="chip {% if status_filter=='available' %}active{% endif %}">ว่าง</a>
+        <a href="{{ url_for('dashboard', search=search, status='borrowed') }}" class="chip {% if status_filter=='borrowed' %}active{% endif %}">ถูกยืมบางส่วน</a>
+        <a href="{{ url_for('dashboard', search=search, status='unavailable') }}" class="chip {% if status_filter=='unavailable' %}active{% endif %}">ไม่พร้อมใช้งาน</a>
+      </div>
+      <button type="submit" class="btn btn-secondary">ค้นหา</button>
+      {% if search or status_filter %}
+        <a href="{{ url_for('dashboard') }}" class="btn btn-ghost">ล้าง</a>
+      {% endif %}
+    </form>
+  </div>
+
+  {% if equipments %}
+  <div class="equipment-grid">
+    {% for eq in equipments %}
+    <div class="eq-card">
+      <div class="eq-img">
+        <img src="{{ eq.image }}" alt="{{ eq.name }}" loading="lazy">
+        <span class="eq-badge {% if eq.status_class=='available' %}badge-available{% else %}badge-unavailable{% endif %}">
+          {{ eq.status_label }}
+        </span>
+      </div>
+      <div class="eq-body">
+        <h3>{{ eq.name }}</h3>
+        <p class="desc">{{ eq.description }}</p>
+        <div class="eq-meta">
+          <div class="meta-box total"><div class="label">ทั้งหมด</div><div class="num">{{ eq.total_quantity }}</div></div>
+          <div class="meta-box avail"><div class="label">ว่าง</div><div class="num">{{ eq.available_quantity }}</div></div>
+          <div class="meta-box borrowed"><div class="label">ถูกยืม</div><div class="num">{{ eq.borrowed_quantity }}</div></div>
+        </div>
+        <div class="eq-actions">
+          <a href="{{ url_for('equipment_detail', eq_id=eq.id) }}" class="btn btn-ghost" style="flex:1;">รายละเอียด</a>
+          {% if eq.available_quantity > 0 %}
+            <a href="{{ url_for('borrow_confirm', eq_id=eq.id) }}" class="btn btn-primary" style="flex:1;">ยืม</a>
+          {% else %}
+            <button class="btn btn-primary" disabled style="flex:1;">ไม่พร้อมยืม</button>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  {% else %}
+  <div class="card card-pad text-center" style="padding:40px;">
+    <div style="font-size:42px;">🔍</div>
+    <h3 style="margin-top:10px;color:#0f2a44;">ไม่พบอุปกรณ์</h3>
+    <p class="muted">ลองเปลี่ยนคำค้นหาหรือล้างตัวกรอง</p>
+    <a href="{{ url_for('dashboard') }}" class="btn btn-secondary" style="margin-top:12px;">ดูทั้งหมด</a>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}
